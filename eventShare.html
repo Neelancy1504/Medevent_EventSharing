@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MedEvents - Redirecting...</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: #f7f9fc;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2e7af5;
+            margin-bottom: 20px;
+        }
+        .message {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .app-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .app-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #2e7af5;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .app-button:hover {
+            background: #1565c0;
+        }
+        .secondary-button {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .secondary-button:hover {
+            background: #e0e0e0;
+        }
+    </style>
+    <script>
+        // Extract event ID from URL
+        const pathParts = window.location.pathname.split('/');
+        const eventType = pathParts[1]; // 'event', 'meeting', etc.
+        const eventId = pathParts[2];
+        
+        // Try to open the app first
+        if (eventType && eventId) {
+            const deepLink = `medevents://${eventType}/${eventId}`;
+            
+            // Try to open the app
+            window.location.href = deepLink;
+            
+            // After a short delay, show the download options
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('download-options').style.display = 'block';
+            }, 2000);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🏥 MedEvents</div>
+        
+        <div id="loading">
+            <div class="message">Opening in MedEvents app...</div>
+            <div>⏳</div>
+        </div>
+        
+        <div id="download-options" style="display: none;">
+            <div class="message">
+                Don't have the MedEvents app installed?<br>
+                Download it now to view this event:
+            </div>
+            
+            <div class="app-buttons">
+                <a href="https://play.google.com/store/apps/details?id=com.health" class="app-button">
+                    📱 Download for Android
+                </a>
+                <a href="https://apps.apple.com/app/medevents/id123456789" class="app-button">
+                    🍎 Download for iOS
+                </a>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <a href="#" onclick="location.reload()" class="app-button secondary-button">
+                    🔄 Try Opening App Again
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
