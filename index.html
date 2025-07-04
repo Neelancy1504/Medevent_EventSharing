@@ -54,35 +54,19 @@
         .secondary-button:hover {
             background: #e0e0e0;
         }
-    </style>
-    <script>
-        // Extract event ID from URL
-        const pathParts = window.location.pathname.split('/');
-        const eventType = pathParts[1]; // 'event', 'meeting', etc.
-        const eventId = pathParts[2];
-        
-        // Try to open the app first
-        if (eventType && eventId) {
-            const deepLink = `medevents://${eventType}/${eventId}`;
-            
-            // Try to open the app
-            window.location.href = deepLink;
-            
-            // After a short delay, show the download options
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('download-options').style.display = 'block';
-            }, 2000);
+        .loading {
+            font-size: 18px;
+            color: #2e7af5;
         }
-    </script>
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="logo">🏥 MedEvents</div>
         
         <div id="loading">
-            <div class="message">Opening in MedEvents app...</div>
-            <div>⏳</div>
+            <div class="loading">Opening in MedEvents app...</div>
+            <div style="font-size: 24px; margin: 20px 0;">⏳</div>
         </div>
         
         <div id="download-options" style="display: none;">
@@ -101,11 +85,43 @@
             </div>
             
             <div style="margin-top: 20px;">
-                <a href="#" onclick="location.reload()" class="app-button secondary-button">
+                <a href="#" onclick="tryOpenApp()" class="app-button secondary-button">
                     🔄 Try Opening App Again
                 </a>
             </div>
         </div>
     </div>
+
+    <script>
+        function tryOpenApp() {
+            // Extract event ID from URL
+            const pathParts = window.location.pathname.split('/');
+            const eventType = pathParts[1]; // 'event', 'meeting', etc.
+            const eventId = pathParts[2];
+            
+            if (eventType && eventId) {
+                const deepLink = `medevents://${eventType}/${eventId}`;
+                console.log('Attempting to open:', deepLink);
+                
+                // Try to open the app
+                window.location.href = deepLink;
+                
+                // Reset UI
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('download-options').style.display = 'none';
+                
+                // Show download options after delay
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('download-options').style.display = 'block';
+                }, 2000);
+            }
+        }
+
+        // Auto-run when page loads
+        window.onload = function() {
+            tryOpenApp();
+        };
+    </script>
 </body>
 </html>
