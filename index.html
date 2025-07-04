@@ -10,6 +10,7 @@
             text-align: center;
             padding: 50px;
             background: #f7f9fc;
+            margin: 0;
         }
         .container {
             max-width: 400px;
@@ -28,12 +29,14 @@
         .message {
             color: #666;
             margin-bottom: 30px;
+            line-height: 1.5;
         }
         .app-buttons {
             display: flex;
             gap: 10px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-top: 20px;
         }
         .app-button {
             display: inline-block;
@@ -43,6 +46,7 @@
             text-decoration: none;
             border-radius: 8px;
             font-weight: 500;
+            transition: background 0.3s;
         }
         .app-button:hover {
             background: #1565c0;
@@ -57,6 +61,29 @@
         .loading {
             font-size: 18px;
             color: #2e7af5;
+            margin-bottom: 20px;
+        }
+        .spinner {
+            font-size: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            color: #e74c3c;
+            background: #fdf2f2;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .success {
+            color: #27ae60;
+            background: #f0f9f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -66,13 +93,27 @@
         
         <div id="loading">
             <div class="loading">Opening in MedEvents app...</div>
-            <div style="font-size: 24px; margin: 20px 0;">⏳</div>
+            <div class="spinner">⏳</div>
+        </div>
+        
+        <div id="error-message" style="display: none;">
+            <div class="error">
+                <strong>Could not detect event information</strong><br>
+                Please make sure you're using a valid MedEvents link.
+            </div>
+        </div>
+        
+        <div id="success-message" style="display: none;">
+            <div class="success">
+                <strong>Attempting to open MedEvents app...</strong><br>
+                If the app doesn't open automatically, try the options below.
+            </div>
         </div>
         
         <div id="download-options" style="display: none;">
             <div class="message">
                 Don't have the MedEvents app installed?<br>
-                Download it now to view this event:
+                Download it now to view this content:
             </div>
             
             <div class="app-buttons">
@@ -85,41 +126,64 @@
             </div>
             
             <div style="margin-top: 20px;">
-                <a href="#" onclick="tryOpenApp()" class="app-button secondary-button">
+                <button onclick="tryOpenApp()" class="app-button secondary-button">
                     🔄 Try Opening App Again
-                </a>
+                </button>
             </div>
         </div>
     </div>
 
     <script>
         function tryOpenApp() {
-            // Extract event ID from URL
-            const pathParts = window.location.pathname.split('/');
-            const eventType = pathParts[1]; // 'event', 'meeting', etc.
-            const eventId = pathParts[2];
+            console.log('Current URL:', window.location.href);
+            console.log('Pathname:', window.location.pathname);
             
-            if (eventType && eventId) {
-                const deepLink = `medevents://${eventType}/${eventId}`;
-                console.log('Attempting to open:', deepLink);
+            // Extract event ID from URL
+            const pathParts = window.location.pathname.split('/').filter(part => part.length > 0);
+            console.log('Path parts:', pathParts);
+            
+            if (pathParts.length >= 2) {
+                const eventType = pathParts[0]; // 'event', 'meeting', etc.
+                const eventId = pathParts[1];
                 
-                // Try to open the app
-                window.location.href = deepLink;
+                console.log('Event type:', eventType);
+                console.log('Event ID:', eventId);
                 
-                // Reset UI
-                document.getElementById('loading').style.display = 'block';
-                document.getElementById('download-options').style.display = 'none';
-                
-                // Show download options after delay
-                setTimeout(() => {
+                if (eventType && eventId) {
+                    const deepLink = `medevents://${eventType}/${eventId}`;
+                    console.log('Attempting to open:', deepLink);
+                    
+                    // Show success message
                     document.getElementById('loading').style.display = 'none';
-                    document.getElementById('download-options').style.display = 'block';
-                }, 2000);
+                    document.getElementById('error-message').style.display = 'none';
+                    document.getElementById('success-message').style.display = 'block';
+                    
+                    // Try to open the app
+                    window.location.href = deepLink;
+                    
+                    // Show download options after delay
+                    setTimeout(() => {
+                        document.getElementById('success-message').style.display = 'none';
+                        document.getElementById('download-options').style.display = 'block';
+                    }, 3000);
+                } else {
+                    showError();
+                }
+            } else {
+                showError();
             }
+        }
+
+        function showError() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('success-message').style.display = 'none';
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('download-options').style.display = 'block';
         }
 
         // Auto-run when page loads
         window.onload = function() {
+            console.log('Page loaded, attempting to parse URL...');
             tryOpenApp();
         };
     </script>
